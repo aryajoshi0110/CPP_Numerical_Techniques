@@ -39,21 +39,5 @@ int main()
         cout << x[i] << " " << y[i] << " " << y_actual[i] << endl;
     }
 
-    // for (int i = 0; i < n; i++)
-    // {
-    //     cout << x[i] << ", " ;
-    // }
-    // cout << endl;
-    // for (int i = 0; i < n; i++)
-    // {
-    //     cout << y[i] << ", " ;
-    // }
-    // cout << endl;
-    // for (int i = 0; i < n; i++)
-    // {
-    //     cout << y_actual[i] << ", " ;
-    // }
-    
-
     return 0;
 }

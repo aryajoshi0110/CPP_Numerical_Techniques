@@ -89,6 +89,35 @@ void State_Space(const vector<double>& x, const vector<double>& y, int n) {
     }
     fprintf(gnuplotPipe, "e\n");  // End of x data
 }
+void State_Space_Animation ( vector<double>& t , int n , double h ) {
+    vector<double> x(n, 0.0) , y(n, 0.0) ;
+    x[0] = 0.5, y[0] = 0.5 ;
+    FILE* gnuplotPipe = popen("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\" -persistent", "w");
+    if (!gnuplotPipe) {
+        cerr << "Error: Could not open pipe to Gnuplot.\n";
+        return;
+    }
+
+    // Send commands to Gnuplot
+    fprintf(gnuplotPipe, "set grid\n");
+    fprintf(gnuplotPipe, "set title 'Variation of Trajectory with mu'\n");
+    fprintf(gnuplotPipe, "set xlabel 'X position'\n");
+    fprintf(gnuplotPipe, "set ylabel 'Y Position'\n");
+    // fprintf(gnuplotPipe, "set xrange [-2.5:2.5]\n");
+    // fprintf(gnuplotPipe, "set yrange [-3:3]\n");
+
+    for (double mu = 0.1; mu <= 4; mu+= 0.1) {
+        RK4(t , x , y , n , h , mu);
+
+        fprintf(gnuplotPipe, "plot '-' with lines title 'mu = %f'\n" , mu);
+        for (int i = 0; i <= n; i++) {
+        fprintf(gnuplotPipe, "%f %f\n", x[i], y[i]);
+        }
+        fprintf(gnuplotPipe, "e\n");
+
+    }
+    
+}
 
 int main() {
     double h = 0.1, mu = 7;
@@ -101,7 +130,7 @@ int main() {
     x_euler[0] = 0.1;
     y_euler[0] = 0.1;
     x_rk4[0] = 0.5 ;
-    x_rk4[0] = 0.5 ;
+    y_rk4[0] = 0.5 ;
 
     for (int i = 0 ; i < n-1 ; i++) t[i+1] = t[i] + h ;
 
@@ -113,7 +142,8 @@ int main() {
     // Time_Series(t, x_euler, y_euler, n);
     Time_Series(t , x_rk4 , y_rk4 , n) ;
     // State_Space(x_euler , y_euler , n) ;
-    State_Space(x_rk4 , y_rk4 , n) ;
+    // State_Space(x_rk4 , y_rk4 , n) ;
+    State_Space_Animation (t , n , h) ;
 
     return 0;
 }

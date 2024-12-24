@@ -85,7 +85,32 @@ void Time_Series(const vector<double>& t, const vector<double>& x, const vector<
 }
 
 
-void State_Space(const vector<double>& x, const vector<double>& y, const vector<double>& z, int n) {
+void State_Space(const vector<double>& x1, const vector<double>& y1, const vector<double>& z1, const vector<double>& x2, const vector<double>& y2, const vector<double>& z2, int n) {
+    // Open a pipe to Gnuplot
+    FILE* gnuplotPipe = popen("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\" -persistent", "w");
+    if (!gnuplotPipe) {
+        cerr << "Error: Could not open pipe to Gnuplot.\n";
+        return;
+    }
+
+    // Send commands to Gnuplot
+    fprintf(gnuplotPipe, "set grid\n");
+    fprintf(gnuplotPipe, "set title 'Lorenz Attractor'\n");
+    fprintf(gnuplotPipe, "set xlabel 'X position'\n");
+    fprintf(gnuplotPipe, "set ylabel 'Y Position'\n");
+    fprintf(gnuplotPipe, "set zlabel 'Z position'\n");
+    fprintf(gnuplotPipe, "splot '-' using 1:2:3 with lines title '(0.1,0.1,0.1)', '-' using 1:2:3 with lines title '(0.1+eps,0.1,0.1)'\n");
+    for (int i = 0; i <= n; i++) {
+    fprintf(gnuplotPipe, "%f %f %f\n", x1[i], y1[i], z1[i]);
+    }
+    fprintf(gnuplotPipe, "e\n");
+    for (int i = 0; i <= n; i++) {
+    fprintf(gnuplotPipe, "%f %f %f\n", x2[i], y2[i], z2[i]);
+    }
+    fprintf(gnuplotPipe, "e\n");
+}
+
+void State_Space_Animation(const vector<double>& x1, const vector<double>& y1, const vector<double>& z1, const vector<double>& x2, const vector<double>& y2, const vector<double>& z2, int n) {
     // Open a pipe to Gnuplot
     FILE* gnuplotPipe = popen("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\" -persistent", "w");
     if (!gnuplotPipe) {
@@ -102,14 +127,16 @@ void State_Space(const vector<double>& x, const vector<double>& y, const vector<
 
     for (int frame = 0; frame < n; frame++)
     {
-        fprintf(gnuplotPipe, "splot '-' using 1:2:3 with lines title 'State Space'\n");
+        fprintf(gnuplotPipe, "splot '-' using 1:2:3 with lines title '(0.1,0.1,0.1)', '-' using 1:2:3 with lines title '(0.1+eps,0.1,0.1)'\n");
         for (int i = 0; i <= frame; i++) {
-        fprintf(gnuplotPipe, "%f %f %f\n", x[i], y[i], z[i]);
+        fprintf(gnuplotPipe, "%f %f %f\n", x1[i], y1[i], z1[i]);
         }
         fprintf(gnuplotPipe, "e\n");
-    }
-    
-     
+        for (int i = 0; i <= frame; i++) {
+        fprintf(gnuplotPipe, "%f %f %f\n", x2[i], y2[i], z2[i]);
+        }
+        fprintf(gnuplotPipe, "e\n");
+    }    
 }
 
 int main() {
@@ -122,28 +149,36 @@ int main() {
     double h = 0.01, r = 28, s = 10, b = 8/3;
     int n = static_cast<int>(50 / h) + 1;
 
-    vector<double> t(n, 0.0), x_euler(n, 0.0), y_euler(n, 0.0), z_euler(n, 0.0), x_rk4(n, 0.0), y_rk4(n, 0.0), z_rk4(n, 0.0) ;
+    vector<double> t(n, 0.0), x_euler(n, 0.0), y_euler(n, 0.0), z_euler(n, 0.0), x1(n, 0.0), y1(n, 0.0), z1(n, 0.0) ;
 
     // Initial conditions
     t[0] = 0;
     x_euler[0] = 0.1;
     y_euler[0] = 0.1;
     z_euler[0] = 0.1;
-    x_rk4[0] = 0.1 ;
-    y_rk4[0] = 0.1 ;
-    z_rk4[0] = 0.1 ;
+    x1[0] = 0.1 ;
+    y1[0] = 0.1 ;
+    z1[0] = 0.1 ;
+
+    vector<double> x2(n, 0.0), y2(n, 0.0), z2(n, 0.0);
+    x2[0] = x1[0] + pow(10,-5);
+    y2[0] = y1[0] , z2[0] = z1[0] ;
+
 
     for (int i = 0 ; i < n-1 ; i++) t[i+1] = t[i] + h ;
 
     // Euler method
-    Euler(t, x_euler, y_euler, z_euler, r, s, b, n, h);
-    RK4(t , x_rk4 , y_rk4 , z_rk4, r, s, b, n, h) ;
-    
+    // Euler(t, x_euler, y_euler, z_euler, r, s, b, n, h);
+    RK4(t , x1 , y1 , z1, r, s, b, n, h) ;
+    RK4(t , x2 , y2 , z2, r, s, b, n, h) ;
     // Plot results
     // Time_Series(t, x_euler, y_euler, z_euler, n);
-    Time_Series(t , x_rk4 , y_rk4 , z_rk4, n) ;
+    Time_Series(t , x1 , y1 , z1, n) ;
+    Time_Series(t , x2 , y2 , z2, n) ;
     // State_Space(x_euler , y_euler , z_euler , n) ;
-    State_Space(x_rk4 , y_rk4 , z_rk4, n) ;
+    // State_Space(x1 , y1 , z1, x2, y2, z2, n) ;
+    State_Space_Animation(x1, y1, z1, x2, y2, z2, n) ;
+    // State_Space(x2, y2, z2, n) ;
 
     return 0;
 }

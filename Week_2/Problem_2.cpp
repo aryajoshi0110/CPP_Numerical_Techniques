@@ -53,13 +53,13 @@ void Time_Series(const vector<double>& t, const vector<double>& x, const vector<
     fprintf(gnuplotPipe, "plot '-' title 'x(t)' with lines, '-' title 'y(t)' with lines\n");
 
     // Send data for x(t)
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n/10; i++) {
         fprintf(gnuplotPipe, "%f %f\n", t[i], x[i]);
     }
     fprintf(gnuplotPipe, "e\n");  // End of x data
 
     // Send data for y(t)
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n/10; i++) {
         fprintf(gnuplotPipe, "%f %f\n", t[i], y[i]);
     }
     fprintf(gnuplotPipe, "e\n");  // End of y data
@@ -129,8 +129,8 @@ int main() {
     t[0] = 0;
     x_euler[0] = 0.1;
     y_euler[0] = 0.1;
-    x_rk4[0] = 0.5 ;
-    y_rk4[0] = 0.5 ;
+    x_rk4[0] = 0.1 ;
+    y_rk4[0] = 0.1 ;
 
     for (int i = 0 ; i < n-1 ; i++) t[i+1] = t[i] + h ;
 
@@ -140,7 +140,7 @@ int main() {
 
     // Plot results
     // Time_Series(t, x_euler, y_euler, n);
-    Time_Series(t , x_rk4 , y_rk4 , n) ;
+    // Time_Series(t , x_rk4 , y_rk4 , n) ;
     // State_Space(x_euler , y_euler , n) ;
     // State_Space(x_rk4 , y_rk4 , n) ;
     State_Space_Animation (t , n , h) ;

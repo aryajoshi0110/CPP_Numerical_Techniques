@@ -90,12 +90,13 @@ int main()
     // z' = sinx + 2cosx - 3y - 4z
 
     double h = 0.1 ;
-    int n = 10/h + 1 ;
+    int n = 20/h + 1 ;
     double x[n] , y_euler[n] , z_euler[n] , y_rk4[n] , z_rk4[n] ,y_actual[n] ;
     x[0] = 0 , y_euler[0] = 1 , z_euler[0] = -1 , y_rk4[0] = 1 , z_rk4[0] = -1 ;
     for (int i = 0; i < n-1; i++) x[i+1] = x[i] + h ;
 
     Euler(x , y_euler , z_euler , n , h) ;
+    // Euler(x , y_rk4 , z_rk4 , int(n/10) , 0.01) ;
     RK4(x , y_rk4 , z_rk4  , n , h) ;
     Actual(x , y_actual , n) ;
 

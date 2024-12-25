@@ -56,7 +56,7 @@ void Time_Series(const vector<double>& t, const vector<double>& x, const vector<
 
     // Send commands to Gnuplot
     fprintf(gnuplotPipe, "set grid\n");
-    fprintf(gnuplotPipe, "set title 'Van der Pol Oscillator'\n");
+    fprintf(gnuplotPipe, "set title 'Lorenz Attractor'\n");
     fprintf(gnuplotPipe, "set xlabel 'Time'\n");
     fprintf(gnuplotPipe, "set ylabel 'Values'\n");
     // fprintf(gnuplotPipe, "set yrange [-3:3]\n") ;
@@ -85,7 +85,7 @@ void Time_Series(const vector<double>& t, const vector<double>& x, const vector<
 }
 
 
-void State_Space(const vector<double>& x1, const vector<double>& y1, const vector<double>& z1, const vector<double>& x2, const vector<double>& y2, const vector<double>& z2, int n) {
+void State_Space(const vector<double>& x1, const vector<double>& y1, const vector<double>& z1, int n) {
     // Open a pipe to Gnuplot
     FILE* gnuplotPipe = popen("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\" -persistent", "w");
     if (!gnuplotPipe) {
@@ -96,9 +96,31 @@ void State_Space(const vector<double>& x1, const vector<double>& y1, const vecto
     // Send commands to Gnuplot
     fprintf(gnuplotPipe, "set grid\n");
     fprintf(gnuplotPipe, "set title 'Lorenz Attractor'\n");
-    fprintf(gnuplotPipe, "set xlabel 'X position'\n");
-    fprintf(gnuplotPipe, "set ylabel 'Y Position'\n");
-    fprintf(gnuplotPipe, "set zlabel 'Z position'\n");
+    fprintf(gnuplotPipe, "set xlabel 'X'\n");
+    fprintf(gnuplotPipe, "set ylabel 'Y'\n");
+    fprintf(gnuplotPipe, "set zlabel 'Z'\n");
+    fprintf(gnuplotPipe, "splot '-' using 1:2:3 with lines title '(0.1,0.1,0.1)'\n");
+    for (int i = 0; i <= n; i++) {
+    fprintf(gnuplotPipe, "%f %f %f\n", x1[i], y1[i], z1[i]);
+    }
+    fprintf(gnuplotPipe, "e\n");
+
+}
+
+void State_Space_Compare(const vector<double>& x1, const vector<double>& y1, const vector<double>& z1, const vector<double>& x2, const vector<double>& y2, const vector<double>& z2, int n) {
+    // Open a pipe to Gnuplot
+    FILE* gnuplotPipe = popen("\"C:\\Program Files\\gnuplot\\bin\\gnuplot.exe\" -persistent", "w");
+    if (!gnuplotPipe) {
+        cerr << "Error: Could not open pipe to Gnuplot.\n";
+        return;
+    }
+
+    // Send commands to Gnuplot
+    fprintf(gnuplotPipe, "set grid\n");
+    fprintf(gnuplotPipe, "set title 'Lorenz Attractor'\n");
+    fprintf(gnuplotPipe, "set xlabel 'X'\n");
+    fprintf(gnuplotPipe, "set ylabel 'Y'\n");
+    fprintf(gnuplotPipe, "set zlabel 'Z'\n");
     fprintf(gnuplotPipe, "splot '-' using 1:2:3 with lines title '(0.1,0.1,0.1)', '-' using 1:2:3 with lines title '(0.1+eps,0.1,0.1)'\n");
     for (int i = 0; i <= n; i++) {
     fprintf(gnuplotPipe, "%f %f %f\n", x1[i], y1[i], z1[i]);
@@ -121,9 +143,9 @@ void State_Space_Animation(const vector<double>& x1, const vector<double>& y1, c
     // Send commands to Gnuplot
     fprintf(gnuplotPipe, "set grid\n");
     fprintf(gnuplotPipe, "set title 'Lorenz Attractor'\n");
-    fprintf(gnuplotPipe, "set xlabel 'X position'\n");
-    fprintf(gnuplotPipe, "set ylabel 'Y Position'\n");
-    fprintf(gnuplotPipe, "set zlabel 'Z position'\n");
+    fprintf(gnuplotPipe, "set xlabel 'X'\n");
+    fprintf(gnuplotPipe, "set ylabel 'Y'\n");
+    fprintf(gnuplotPipe, "set zlabel 'Z'\n");
 
     for (int frame = 0; frame < n; frame++)
     {
@@ -168,17 +190,18 @@ int main() {
     for (int i = 0 ; i < n-1 ; i++) t[i+1] = t[i] + h ;
 
     // Euler method
-    // Euler(t, x_euler, y_euler, z_euler, r, s, b, n, h);
+    Euler(t, x_euler, y_euler, z_euler, r, s, b, n, h);
     RK4(t , x1 , y1 , z1, r, s, b, n, h) ;
     RK4(t , x2 , y2 , z2, r, s, b, n, h) ;
     // Plot results
     // Time_Series(t, x_euler, y_euler, z_euler, n);
     Time_Series(t , x1 , y1 , z1, n) ;
-    Time_Series(t , x2 , y2 , z2, n) ;
+    // Time_Series(t , x2 , y2 , z2, n) ;
     // State_Space(x_euler , y_euler , z_euler , n) ;
-    // State_Space(x1 , y1 , z1, x2, y2, z2, n) ;
-    State_Space_Animation(x1, y1, z1, x2, y2, z2, n) ;
-    // State_Space(x2, y2, z2, n) ;
+    // State_Space(x1 , y1 , z1, n) ;
+
+    // State_Space_Compare(x1 , y1 , z1, x2, y2, z2, n) ;
+    // State_Space_Animation(x1, y1, z1, x2, y2, z2, n) ;
 
     return 0;
 }

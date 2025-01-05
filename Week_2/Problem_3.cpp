@@ -201,7 +201,7 @@ int main() {
     // State_Space(x1 , y1 , z1, n) ;
 
     // State_Space_Compare(x1 , y1 , z1, x2, y2, z2, n) ;
-    // State_Space_Animation(x1, y1, z1, x2, y2, z2, n) ;
+    State_Space_Animation(x1, y1, z1, x2, y2, z2, n) ;
 
     return 0;
 }

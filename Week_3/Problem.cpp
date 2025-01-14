@@ -24,33 +24,29 @@ void make_laplacian_operator (vector<vector<double>>& M){
     // vector<double> M_flat (M.size()*M.size(),0.0) ;
     int n = pow(M.size(),0.5);
     for (int i = 0; i < M.size(); i++){
-        for (int j = 0; j < M[i].size(); j++){
-            if (i == j){
-                M[i][j] = 4;
+            M[i][i] = 4;
 
-                if (j%n == 0){
-                    M[i][j+1] = -1;
-                }
-                else if (j%n == n-1){
-                    M[i][j-1] = -1;
-                }
-                else{
-                    M[i][j-1] = -1;
-                    M[i][j+1] = -1;
-                }
-                
-
-                if (j-n >= 0 and j+n < M[i].size()){
-                M[i][j-n] = -1;
-                M[i][j+n] = -1;
-                }
-                else if (j-n >= 0){
-                    M[i][j-n] = -1;
-                }
-                else{
-                    M[i][j+n] = -1;
-                }
+            if (i%n == 0){
+                M[i][i+1] = -1;
             }
+            else if (i%n == n-1){
+                M[i][i-1] = -1;
+            }
+            else{
+                M[i][i-1] = -1;
+                M[i][i+1] = -1;
+            }
+            
+
+            if (i-n >= 0 and i+n < M[i].size()){
+            M[i][i-n] = -1;
+            M[i][i+n] = -1;
+            }
+            else if (i-n >= 0){
+                M[i][i-n] = -1;
+            }
+            else{
+                M[i][i+n] = -1;
         }
     }
 }
